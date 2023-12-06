@@ -1,0 +1,196 @@
+<div id="text-generation-tool">
+    <h1>YouTube Title Generator</h1>
+    <input type="text" id="topic" placeholder="Your Topic...">
+    <button id="generate-button">Generate Titles!</button>
+    <div id="result-container" style="display: none;">
+        <div class="result-wrapper">
+            <div class="result-content">
+                <textarea id="result" readonly></textarea>
+            </div>
+            <div class="copy-button-container">
+                <button id="copy-button">Copy</button>
+            </div>
+        </div>
+    </div>
+    <div id="loading" class="loader" style="display: none;"></div>
+</div>
+
+<style>
+    /* Basic styles for the text generation tool */
+    #text-generation-tool {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        font-family: Arial, sans-serif;
+    }
+
+    #topic {
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    #generate-button {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        background-color: #3498db;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #generate-button:hover {
+        background-color: #2980b9;
+    }
+
+    #result-container {
+        display: none;
+        margin-bottom: 20px;
+    }
+
+    .result-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .result-content {
+        display: flex;
+    }
+
+    #result {
+        flex: 1;
+        height: 400px;
+        padding: 15px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+    }
+
+    .copy-button-container {
+        margin-top: 10px;
+        text-align: right;
+    }
+
+    #copy-button {
+        padding: 8px 12px;
+        font-size: 14px;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        background-color: #3498db;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #copy-button:hover {
+        background-color: #2980b9;
+    }
+
+    /* CSS for the loader */
+    .loader {
+        display: block;
+        margin: 50px auto;
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+
+
+
+
+
+
+
+<script>
+    document.getElementById("generate-button").addEventListener("click", function(e){
+        e.preventDefault();
+        
+        
+        var generateButton = document.getElementById("generate-button");
+        
+        if (generateButton.disabled) {
+            return; // Prevent multiple clicks while content is being generated
+        }
+        
+        generateButton.disabled = true;
+        
+        
+        
+        var topic = document.getElementById('topic').value;
+        var loading = document.getElementById('loading');
+        var result = document.getElementById('result');
+        var resultC = document.getElementById('result-container');
+
+        
+
+
+        
+
+        loading.style.display = 'block';
+        result.style.display = 'none'; // hide result textarea
+        resultC.style.display = 'none';
+        
+
+        var formData = new FormData();
+        formData.append('action', 'openai_generate_text');
+        formData.append('prompt', prompt);
+
+        fetch('https://toolzset.com/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            loading.style.display = 'none';
+            if(data.success) {
+                result.value = data.data.choices[0].message.content; 
+                result.style.display = 'block'; // show result textarea
+                resultC.style.display = 'block';
+                generateButton.disabled = false;
+            } else {
+                result.value = 'An error occurred: ' + data.data;
+                result.style.display = 'block'; // show result textarea
+                resultC.style.display = 'block';
+                generateButton.disabled = false;
+            }
+        })
+        .catch(error => {
+            loading.style.display = 'none';
+            result.value = 'An error occurred: ' + error.message;
+            result.style.display = 'block'; // show result textarea
+            resultC.style.display = 'block';
+            generateButton.disabled = false;
+            
+        });
+    });
+    
+    var copyButton = document.getElementById('copy-button');
+    copyButton.addEventListener('click', function() {
+        var result = document.getElementById('result');
+        result.select();
+        document.execCommand('copy');
+        alert('Copied to clipboard!');
+    });
+</script>
+
+
+
